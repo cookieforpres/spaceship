@@ -1,0 +1,13 @@
+# Binaries for programs and plugins
+main
+spaceship
+*.exe
+*.exe~
+*.so
+*.dylib
+*.dll
+vls.log
+.vscode
+notes.txt
+tools
+.DS_Store
