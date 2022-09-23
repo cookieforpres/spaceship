@@ -48,6 +48,13 @@ pub mut:
 	file_type StaticFileType
 }
 
+pub enum ErrorMessage {
+	no_error
+	not_found
+	method_not_allowed
+	internal_server_error
+}
+
 pub fn (mut sp Spaceship) static_folder(path string) ? {
 	mut path_ := path
 	for {
@@ -192,7 +199,7 @@ fn (mut sp Spaceship) handle_connection(mut conn net.TcpConn) ? {
 	mut request := Request{method: method, path: path, body: body, headers: headers, start_time: start, conn: conn}
 	mut response := new_response()
 
-	mut error_message := ''
+	mut error_message := ErrorMessage.no_error
 	mut found := false
 	for route in sp.routes {	
 		if route.path == request.path {
@@ -205,7 +212,7 @@ fn (mut sp Spaceship) handle_connection(mut conn net.TcpConn) ? {
 				found = true
 				break
 			} else {
-				error_message = 'method not allowed'
+				error_message = ErrorMessage.method_not_allowed
 				break
 			} 
 		}
@@ -276,8 +283,8 @@ fn (mut sp Spaceship) handle_connection(mut conn net.TcpConn) ? {
 		}
 	}
 
-	if !found && error_message != 'method not allowed' {
-		error_message = 'not found'
+	if !found && error_message != ErrorMessage.method_not_allowed {
+		error_message = ErrorMessage.not_found
 	}
 
 	if !sp.config.show_server_header {
@@ -285,7 +292,7 @@ fn (mut sp Spaceship) handle_connection(mut conn net.TcpConn) ? {
 	}
 
 	match error_message {
-		'method not allowed' {
+		.method_not_allowed {
 			for dr in sp.default_responses {
 				if dr.status_code == 405 {
 					response.set_status_code(dr.status_code)
@@ -297,7 +304,7 @@ fn (mut sp Spaceship) handle_connection(mut conn net.TcpConn) ? {
 			run_response(mut sp, mut conn, mut request, mut response) ?
 			conn.close() ?
 		} 
-		'not found' {
+		.not_found {
 			for dr in sp.default_responses {
 				if dr.status_code == 404 {
 					response.set_status_code(dr.status_code)

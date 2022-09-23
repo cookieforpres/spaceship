@@ -11,3 +11,4 @@ vls.log
 notes.txt
 tools
 .DS_Store
+*_test.v
