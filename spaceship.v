@@ -340,6 +340,7 @@ pub fn new(host string, port int) Spaceship {
 		host: host, 
 		port: port, 
 		default_responses: default_responses,
+		static_path: '',
 		config: SpaceshipConfig {
 			verbose: true
 			show_favicon_request: true
